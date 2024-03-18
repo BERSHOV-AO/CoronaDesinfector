@@ -2,17 +2,15 @@ package ru.senla;
 
 public class CoronaDesinfector {
 
+    private Announcer announcer = ObjectFactory.getInstance().createObject(Announcer.class);
+    private Policeman policeman = ObjectFactory.getInstance().createObject(Policeman.class);
+
     public void start(Room room) {
-
         // желательно Announcer(диктор) делать интерфейсом, по тому что для разных клиентов он может имплементирован по разному
-        private Announcer announcer;
-
         announcer.announce("Начинаем дезинфекцию, все вон!");
         policeman.makePeopleLeaveRoom();
-        // todo разогнать всех ето не вышел после объявления
         desinfect(room);
         announcer.announce("Рискните зайти обратно!");
-
     }
 
     private void desinfect(Room room) {
