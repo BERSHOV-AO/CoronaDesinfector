@@ -3,10 +3,15 @@ package ru.senla;
 public class CoronaDesinfector {
 
     public void start(Room room) {
-        // todo сообщить всем присутствующим в комнате, о начале дезинфекции, попросить все свалить
+
+        // желательно Announcer(диктор) делать интерфейсом, по тому что для разных клиентов он может имплементирован по разному
+        private Announcer announcer;
+
+        announcer.announce("Начинаем дезинфекцию, все вон!");
+        policeman.makePeopleLeaveRoom();
         // todo разогнать всех ето не вышел после объявления
         desinfect(room);
-        // todo сообщить всем присутствующим в комнате, что они могут вернуться обратно
+        announcer.announce("Рискните зайти обратно!");
 
     }
 
