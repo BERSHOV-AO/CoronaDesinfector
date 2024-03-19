@@ -19,11 +19,11 @@ public class JavaConfig implements Config {
     @Override
     public <T> Class<? extends T> getImplClass(Class<T> ifc) {
 
-        Set<Class<? extends T>> classes = scanner.getSubTypesOf(ifc);
+        Set<Class<? extends T>> classes = scanner.getSubTypesOf(ifc); // сканер дай все подвиды данного класса
         if(classes.size() != 1) { // если не одно имплементация данного интерфейса, то выбрасываем исключение
-            throw new RuntimeException(ifc+" has 0 or more then one impl")
+            throw new RuntimeException(ifc+" has 0 or more then one impl");
         }
-
-        return null;
+        // берем класс который мы нашли(имплементацию), iterator() - по тому что set, берем next/
+        return classes.iterator().next();
     }
 }

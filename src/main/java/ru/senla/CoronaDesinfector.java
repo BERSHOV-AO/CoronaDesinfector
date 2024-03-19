@@ -6,7 +6,8 @@ public class CoronaDesinfector {
     private Policeman policeman = ObjectFactory.getInstance().createObject(Policeman.class);
 
     public void start(Room room) {
-        // желательно Announcer(диктор) делать интерфейсом, по тому что для разных клиентов он может имплементирован по разному
+        // желательно Announcer(диктор) делать интерфейсом,
+        // по тому что для разных клиентов он может имплементирован по разному
         announcer.announce("Начинаем дезинфекцию, все вон!");
         policeman.makePeopleLeaveRoom();
         desinfect(room);
