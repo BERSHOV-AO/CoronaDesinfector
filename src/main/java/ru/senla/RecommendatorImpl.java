@@ -1,8 +1,10 @@
 package ru.senla;
 
+@Singleton
 public class RecommendatorImpl implements Recommendator {
 
-    @InjectProperty // если alcohol, совпадает с названием в файле application.properties,
+    @InjectProperty("wisky")
+    //@InjectProperty // если alcohol, совпадает с названием в файле application.properties,
     // то можно ничего не писать в аргументах аннотации @InjectProperty либо @InjectProperty("alcohol")
     private String alcohol;
 

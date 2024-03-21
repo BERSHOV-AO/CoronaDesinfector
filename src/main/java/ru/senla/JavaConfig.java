@@ -1,5 +1,6 @@
 package ru.senla;
 
+import lombok.Getter;
 import org.reflections.Reflections;
 
 import java.util.Map;
@@ -10,6 +11,9 @@ public class JavaConfig implements Config {
     // в большинстве случаев, имплементация у интерфейсов, будет одна
     // скорее всего при сборке проекта буде какой то jar, в котором будут лежать имплементации,
     // и имплементация для каждого интерфейса, чаще всего будет одна,
+
+    // если кото то захочет сам взять сканер и поискать, что нибудь свое, мы сможем этот сканер отдать
+    @Getter
     private Reflections scanner;
 
     // map для хранения имплементаций
