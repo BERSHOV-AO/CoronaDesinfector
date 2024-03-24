@@ -1,7 +1,12 @@
 package ru.senla;
 
 @Singleton
+@Deprecated
 public class RecommendatorImpl implements Recommendator {
+
+    public RecommendatorImpl() {
+        System.out.println("recommendator was creator");
+    }
 
     @InjectProperty("wisky")
     //@InjectProperty // если alcohol, совпадает с названием в файле application.properties,

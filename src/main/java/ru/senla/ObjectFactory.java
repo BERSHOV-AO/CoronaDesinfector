@@ -4,9 +4,12 @@ package ru.senla;
 import lombok.Setter;
 import lombok.SneakyThrows;
 
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,16 +21,9 @@ import static java.util.stream.Collectors.toMap;
 
 // так делали раньше
 public class ObjectFactory {
-   // private static ObjectFactory ourInstance = new ObjectFactory();
-    //   private Config config = new JavaConfig("ru.senla"); // пока хардкодим
- //  private static ObjectFactory objectFactory;
-
     private final ApplicationContext context;
     private List<ObjectConfigurator> configurators = new ArrayList<>();
 
-//    public static ObjectFactory getInstance() {
-//        return ourInstance;
-//    }
 
     // Map.of(Policeman.class, AngryPoliceman.class))); указываем что Policeman.class имеет больше одной имплементации,
     // поэтому указываем что используем имплементацию AngryPoliceman.class
@@ -46,64 +42,42 @@ public class ObjectFactory {
         }
     }
 
-    // пока не было дженериков было так
-    // public Object objectObject(Class type);
+
 
     // в рантайме пришел объект типа T то возвращать тоже будем объект типа Т
     @SneakyThrows // для того что бы не обрабатывать exceptions
     public <T> T createObject(Class<T> implClass) {
-//        Class<? extends T> implClass = type; // вдруг это класс конкретный
-//        if (type.isInterface()) {
-//            implClass = config.getImplClass(type); // заменяем на конкретный тип
-//        }
-        // уверены что у нас есть дефолтный конструктор
-        T t = implClass.getDeclaredConstructor().newInstance();
-        //todo настройка
-
-        // берем у класса implClass все его поля, итерируемся,
-//        for (Field field : implClass.getDeclaredFields()) {
-//            // у каждого поля пытаемся считать аннотацию InjectProperty
-//            InjectProperty annotation = field.getAnnotation(InjectProperty.class);
-//
-//            //------------------------------------------------------------------------
-//            // временная реализация работы с application.properties
-//            String path = ClassLoader.getSystemClassLoader().getResource("application.properties").getPath();
-//            Stream<String> lines = new BufferedReader(new FileReader(path)).lines();
-//            //split без пробелов
-//            Map<String, String> propertiesMap =
-//                    lines.map(line -> line.split("=")).collect(toMap(arr -> arr[0], arr -> arr[1]));
-
-
-            //------------------------------------------------------------------------
-            // делаем проверку что не получили сдесь null
-
-//            if(annotation != null) {
-//                String value;
-//                // если в аннотации значение пустое, то тогда мы захотим вытаскивать из нашего application.properties
-//                // значение поля value пустое, тогда мы идем в наш propertiesMap
-//                if(annotation.value().isEmpty()) {
-//                    // Вытягиваем из propertiesMap по названию поля(field)
-//                    value = propertiesMap.get(field.getName());
-//                }else {
-//                    // если у нас properties не пустой, то берем из аннотации // если значение было, то его и берем
-//                    value = propertiesMap.get(annotation.value());
-//                }
-//            }
-
-//            if (annotation != null) {
-//                String value =
-//                        annotation.value().isEmpty() ? propertiesMap.get(field.getName()) : propertiesMap.get(annotation.value());
-//                // таким образом мы берм значение которое нам нужно будет засетить, в наше поле (field)
-//                // После вызова метода setAccessible(true), можно получить доступ к значению поля и изменить его,
-//                // игнорируя модификаторы доступа
-//                field.setAccessible(true);
-//                // настройка объекта t, передаем ему значение
-//                field.set(t, value);
-//           }
-//        }
+       // T t = implClass.getDeclaredConstructor().newInstance();
+        // создаем объект класса
+        T t = create(implClass);
 
         // берем все наши конфигураторы, и просим каждый из них настроить наш объект t
-       configurators.forEach(objectConfigurator -> objectConfigurator.configure(t, context));
+        // настраиваем
+        configure(t);
+
+//        for (Method method : implClass.getMethods()) {
+//            if(method.isAnnotationPresent(PostConstruct.class)) {
+//                method.invoke(t); // запускаем метод именно на этом объекте t
+//            }
+//        }
+        // запуск вторичных конструкторов класса
+        invokeInit(implClass, t);
+
         return t;
+    }
+
+    private <T> void invokeInit(Class<T> implClass, T t) throws InvocationTargetException, IllegalAccessException {
+        for (Method method : implClass.getMethods()) {
+            if(method.isAnnotationPresent(PostConstruct.class)) {
+                method.invoke(t); // запускаем метод именно на этом объекте t
+            }
+        }
+
+    }
+    private <T> void configure(T t) {
+        configurators.forEach(objectConfigurator -> objectConfigurator.configure(t, context));
+    }
+    private <T> T create(Class<T> implClass) throws InstantiationError, IllegalAccessError, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+       return implClass.getDeclaredConstructor().newInstance();
     }
 }
